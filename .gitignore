@@ -1,0 +1,8 @@
+# Ignore CSV files
+*.csv
+
+# Ignore joblib files
+*.joblib
+
+# Ignore pickle files
+*.pickle
