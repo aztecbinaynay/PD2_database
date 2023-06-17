@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import requests
 
 # Generate a random 6-digit userID using letters and digits
-userID = "".join(random.choices(string.ascii_letters + string.digits, k=6))
+userID = "ACG123"
 
 # Define the start time and end time for TimeIn and TimeOut
 start_time = datetime(2023, 6, 12, 8, 0, 0)
@@ -37,7 +37,7 @@ data_dict = {
 }
 print("Data created")
 
-url = "http://192.168.115.106:5000/insert"
+url = "http://localhost:5000/insert"
 
 # Send the request and measure the time taken
 print("Sending request...")
