@@ -1,22 +1,12 @@
 from flask import Flask, request, jsonify
 import sqlite3
+import asyncio
 
 app = Flask(__name__)
-
 
 @app.route("/")
 def home():
     return "Hello, Flask!"
-
-
-@app.route("/data", methods=["POST"])
-def receive_data():
-    data = request.get_json()  # Get the JSON data from the request
-
-    # Process the data as needed
-    print(data)
-    return "Data received and processed"
-
 
 @app.route("/insert", methods=["POST"])
 def insert_data():
@@ -110,7 +100,6 @@ def get_data():
         conn.close()
         print("Error", e)
         return str(e), 500
-
 
 if __name__ == "__main__":
     app.run(host="localhost", port=5000, debug=True)
