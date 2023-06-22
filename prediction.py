@@ -12,7 +12,7 @@ import pandas as pd
 from datetime import datetime
 
 
-async def prediction(data, conn):
+def prediction(data):
     AHI_table = {
         "Severity": None,
         "AHI": None,

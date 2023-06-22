@@ -4,13 +4,13 @@ from datetime import datetime, timedelta
 import requests
 
 # Generate a random 6-digit userID using letters and digits
-userID = "ACG123"
+userID = "XYZ691"
 
 # Define the start time and end time for TimeIn and TimeOut
 start_time = datetime(2023, 6, 12, 8, 0, 0)
 end_time = start_time + timedelta(hours=8)
 
-num_data_points = 691200
+num_data_points = 172800
 
 # Convert lists to strings
 print("Data being made into strings")

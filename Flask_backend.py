@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 import sqlite3
-import asyncio
+from prediction import prediction
+import concurrent.futures
 
 app = Flask(__name__)
+
+executor = concurrent.futures.ThreadPoolExecutor()
 
 @app.route("/")
 def home():
@@ -41,6 +44,7 @@ def insert_data():
         # Commit the transaction if all insertions are successful
         conn.commit()
         conn.close()
+        executor.submit(prediction_task, data)
         print("Data inserted")
         return "Data inserted"
     except Exception as e:
@@ -50,6 +54,46 @@ def insert_data():
         print("Error", e)
         return "Data not inserted"
 
+def prediction_task(data):
+    try:
+        print("prediction starting")
+        result = prediction(data)
+        print("prediction end")
+        print("Data inserting...")
+        conn = sqlite3.connect(
+            r"C:\Users\Toshiba\Documents\PD2_john\databases\SensorReadings.db"
+        )
+        cursor = conn.cursor()
+
+        # Begin a transaction
+        conn.execute("BEGIN TRANSACTION")
+
+        cursor.execute(
+            """
+            INSERT INTO AHI_table (Severity, AHI, TimeIn, TimeOut, UserID, Normal, Apnea, Hypopnea)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+            (
+                result["Severity"],
+                result["AHI"],
+                result["TimeIn"],
+                result["TimeOut"],
+                result["UserID"],
+                result["Normal"],
+                result["Apnea"],
+                result["Hypopnea"]
+            ),
+        )
+
+        # Commit the transaction if all insertions are successful
+        conn.commit()
+        conn.close()
+        print("Data inserted")
+    except Exception as e:
+        # Rollback the transaction if an error occurs
+        conn.rollback()
+        conn.close()
+        print("Error", e)
 
 @app.route("/retrieve", methods=["POST"])
 def get_data():
