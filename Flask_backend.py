@@ -95,8 +95,8 @@ def prediction_task(data):
         conn.close()
         print("Error", e)
 
-@app.route("/retrieve", methods=["POST"])
-def get_data():
+@app.route("/retrieveUserData", methods=["POST"])
+def getUser_data():
     try:
         data = request.get_json()  # Get the JSON data from the request
         conn = sqlite3.connect(
@@ -107,7 +107,64 @@ def get_data():
         # Begin a transaction
         conn.execute("BEGIN TRANSACTION")
 
-        cursor.execute("SELECT * FROM SensorReadings WHERE UserID=?", (data["UserID"],))
+        cursor.execute(
+            "SELECT UserID, TimeIn, TimeOut FROM SensorReadings WHERE UserID=?",
+            (data["UserID"],),
+        )
+
+        # Fetch all the rows from the result
+        rows = cursor.fetchall()
+
+        if rows:
+            # Create a list to store the retrieved data
+            data_list = []
+            for row in rows:
+                UserID, TimeIn, TimeOut = row
+                time_dict = {
+                    "TimeIn": TimeIn,
+                    "TimeOut": TimeOut,
+                }
+                data_list.append(time_dict)
+
+            # Create a dictionary to store the final response
+            response_dict = {
+                "UserID": data["UserID"],
+                "Time": data_list,
+            }
+
+            conn.commit()
+            conn.close()
+            print("Data retrieved")
+            return jsonify(response_dict), 200
+
+        conn.commit()
+        conn.close()
+        print("Data unavailable")
+        return "No data found for the given UserID", 404
+
+    except Exception as e:
+        # Rollback the transaction if an error occurs
+        conn.rollback()
+        conn.close()
+        print("Error", e)
+        return str(e), 500
+
+@app.route("/retrieveUserInstance", methods=["POST"])
+def getInstance_data():
+    try:
+        data = request.get_json()  # Get the JSON data from the request
+        conn = sqlite3.connect(
+            r"C:\Users\Toshiba\Documents\PD2_john\databases\SensorReadings.db"
+        )
+        cursor = conn.cursor()
+
+        # Begin a transaction
+        conn.execute("BEGIN TRANSACTION")
+
+        cursor.execute(
+            "SELECT * FROM SensorReadings WHERE UserID=? AND TimeIn=? AND TimeOut=?",
+            (data["UserID"], data["TimeIn"], data["TimeOut"]),
+        )
 
         # Fetch the row from the result
         row = cursor.fetchone()

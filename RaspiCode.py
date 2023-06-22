@@ -7,10 +7,10 @@ import requests
 userID = "XYZ691"
 
 # Define the start time and end time for TimeIn and TimeOut
-start_time = datetime(2023, 6, 12, 8, 0, 0)
+start_time = datetime(2023, 6, 20, 8, 0, 0)
 end_time = start_time + timedelta(hours=8)
 
-num_data_points = 172800
+num_data_points = 165963
 
 # Convert lists to strings
 print("Data being made into strings")
