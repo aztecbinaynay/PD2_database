@@ -7,9 +7,11 @@ app = Flask(__name__)
 
 executor = concurrent.futures.ThreadPoolExecutor()
 
+
 @app.route("/")
 def home():
     return "Hello, Flask!"
+
 
 @app.route("/insert", methods=["POST"])
 def insert_data():
@@ -54,6 +56,7 @@ def insert_data():
         print("Error", e)
         return "Data not inserted"
 
+
 def prediction_task(data):
     try:
         print("prediction starting")
@@ -81,7 +84,7 @@ def prediction_task(data):
                 result["UserID"],
                 result["Normal"],
                 result["Apnea"],
-                result["Hypopnea"]
+                result["Hypopnea"],
             ),
         )
 
@@ -94,6 +97,7 @@ def prediction_task(data):
         conn.rollback()
         conn.close()
         print("Error", e)
+
 
 @app.route("/retrieveUserData", methods=["POST"])
 def getUser_data():
@@ -149,6 +153,7 @@ def getUser_data():
         print("Error", e)
         return str(e), 500
 
+
 @app.route("/retrieveUserInstance", methods=["POST"])
 def getInstance_data():
     try:
@@ -185,6 +190,32 @@ def getInstance_data():
                 "TimeIn": TimeIn,
                 "TimeOut": TimeOut,
             }
+
+            # Retrieve data from AHI_table
+            cursor.execute(
+                "SELECT Severity, AHI, Normal, Apnea, Hypopnea FROM AHI_table WHERE UserID=? AND TimeIn=? AND TimeOut=?",
+                (data["UserID"], data["TimeIn"], data["TimeOut"]),
+            )
+
+            # Fetch the row from the result
+            ahi_row = cursor.fetchone()
+
+            if ahi_row is not None:
+                # Extract the values from the AHI row
+                Severity, AHI, Normal, Apnea, Hypopnea = ahi_row
+
+                # Create a dictionary to store the retrieved data from AHI_table
+                ahi_dict = {
+                    "Severity": Severity,
+                    "AHI": AHI,
+                    "Normal": Normal,
+                    "Apnea": Apnea,
+                    "Hypopnea": Hypopnea,
+                }
+
+                # Combine the data dictionaries
+                data_dict2.update(ahi_dict)
+
             conn.commit()
             conn.close()
             print("Data retrieved")
@@ -201,6 +232,7 @@ def getInstance_data():
         conn.close()
         print("Error", e)
         return str(e), 500
+
 
 if __name__ == "__main__":
     app.run(host="localhost", port=5000, debug=True)

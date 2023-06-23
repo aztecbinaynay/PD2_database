@@ -166,5 +166,4 @@ def prediction(data):
         return AHI_table
 
     AHI_table = create_integer_counts_dict(df_predict, AHI_table)
-    
     return AHI_table
