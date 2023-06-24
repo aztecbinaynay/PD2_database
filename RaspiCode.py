@@ -4,23 +4,38 @@ from datetime import datetime, timedelta
 import requests
 
 # Generate a random 6-digit userID using letters and digits
-userID = "RED346"
+userID = "Beb123"
 
 # Define the start time and end time for TimeIn and TimeOut
 start_time = datetime(2023, 6, 20, 8, 0, 0)
 end_time = start_time + timedelta(hours=8)
 
-num_data_points = 172800
+# num_data_points = 172800
 
 # Convert lists to strings
 print("Data being made into strings")
 
-therm_data = str([random.randint(0, 500) for _ in range(num_data_points)])
-ecg_data = str([random.randint(0, 500) for _ in range(num_data_points)])
-airflow_data = str([random.randint(0, 500) for _ in range(num_data_points)])
-snore_data = str([random.randint(0, 500) for _ in range(num_data_points)])
-spo2_data = str([random.randint(0, 500) for _ in range(num_data_points)])
-hr_data = str([random.randint(0, 500) for _ in range(num_data_points)])
+file_path = r"C:\Users\Toshiba\Documents\PD2_john\databases\data_1687589315209.txt"
+
+result = {}
+
+with open(file_path, "r") as file:
+    lines = file.readlines()
+
+header = lines[0].strip().split("\t")  # Get the column names from the first line
+
+for i in range(len(header)):
+    column_values = [
+        float(row.strip().split("\t")[i]) for row in lines[1:]
+    ]  # Convert values to floats
+    result[header[i]] = column_values
+
+therm_data = str(result["DHT11"])
+ecg_data = str(result["ECG"])
+airflow_data = str(result["AirFlow"])
+snore_data = str(result["Snore"])
+spo2_data = str(result["SpO2"])
+hr_data = str(result["PulseRate"])
 
 # Create the dictionary with keys and values
 print("Data being created")
